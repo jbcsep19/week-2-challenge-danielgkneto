@@ -20,46 +20,59 @@ import java.util.*;
 
 public class Main {
 
-
     private static final String[] availableIngredients = new String[] {"rice", "meat", "beans", "salsa", "veggies", "cheese", "guac", "queso", "sourCream"};
-    private static final String[] rice = new String[] {"no rice", "white rice", "brown rice"};
-    private static final String[] meat = new String[] {"no meat", "chicken", "steak", "carnidas", "chorizo", "sofritas", "veggies"};
-    private static final String[] beans = new String[] {"no beans", "pinto beans", "black beans"};
-    private static final String[] salsa = new String[] {"no salsa", "mild salsa", "medium salsa", "hot salsa"};
-    private static final String[] veggies = new String[] {"no veggies", "lettuce", "fajita veggies"};
-    private static final String[] cheese = new String[] {"no cheese", "cheese"};
-    private static final String[] guac = new String[] {"no guac", "guac"};
-    private static final String[] queso = new String[] {"no queso", "queso"};
-    private static final String[] sourCream = new String[] {"no sour cream", "sour cream"};
+    private static final HashMap<String, String[]> ingredientDetails = new HashMap<String, String[]>();
 
     public static void main(String[] args) {
 
-
         List<Burrito> burritos = new ArrayList<>();
 
+        ingredientDetails.put("rice", new String[] {"no rice", "white rice", "brown rice"});
+        ingredientDetails.put("meat", new String[] {"no meat", "chicken", "steak", "carnidas", "chorizo", "sofritas", "veggies"});
+        ingredientDetails.put("beans", new String[] {"no beans", "pinto beans", "black beans"});
+        ingredientDetails.put("salsa", new String[] {"no salsa", "mild salsa", "medium salsa", "hot salsa"});
+        ingredientDetails.put("veggies", new String[] {"no veggies", "lettuce", "fajita veggies"});
+        ingredientDetails.put("cheese", new String[] {"no cheese", "cheese"});
+        ingredientDetails.put("guac", new String[] {"no guac", "guac"});
+        ingredientDetails.put("queso", new String[] {"no queso", "queso"});
+        ingredientDetails.put("sourCream", new String[] {"no sour cream", "sour cream"});
+
+        System.out.println("\n***Burritos Generator***\n");
+        //generates 25 random Burritos
         for (int i = 0; i < 25; i++){
             burritos.add(getRandomBurrito());
+            System.out.printf("\nBurrito #%d: %s Price: $%.2f", i+1, burritos.get(i).getDetailedIngredients(), burritos.get(i).getPrice());
         }
     }
 
+    //return a random Burrito with 5 to 9 ingredients
     private static Burrito getRandomBurrito() {
         Burrito randomBurrito = new Burrito();
-        List<String> options = new ArrayList<>();
-        Collections.addAll(options, availableIngredients);
+        List<String> randomIngredients = new ArrayList<String>();
         //get a random number of ingredients (5 to 9)
         int numberIngredients = new Random().nextInt(5) + 5;
-        List<Integer> randomIngredientsIndexes = new ArrayList<>();
+        int chargeableIngredients = numberIngredients;
 
-        //choose ingredients randomly
-        int counter = 0;
-        while (counter < numberIngredients) {
-            int randomIndex = new Random().nextInt(9);
-            if (!options.contains(availableIngredients[randomIndex])){
-                options.add(availableIngredients[randomIndex]);
-                counter++;
-            }
+        //randomly stores the ingredient's details for all 9 ingredients
+        for (String ingredient : availableIngredients) {
+            String[] details = ingredientDetails.get(ingredient);
+            randomIngredients.add(details[new Random().nextInt(details.length)]);
         }
-        
 
+        //shuffle ingredients list and randomly pick 5 to 9 of them
+        Collections.shuffle(randomIngredients);
+        for (int i = 0; i < (9 - numberIngredients); i++)
+            randomIngredients.remove(i);
+
+        //get number of chargeble ingredients
+        for (String ingredient : randomIngredients) {
+            if (ingredient.substring(0,3).equals("no "))
+                chargeableIngredients--;
+        }
+
+        randomBurrito.setDetailedIngredients(randomIngredients);
+        randomBurrito.setPrice(chargeableIngredients);
+
+        return randomBurrito;
     }
 }
